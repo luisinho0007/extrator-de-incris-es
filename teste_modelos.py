@@ -102,25 +102,11 @@ def main():
                 ip_display = meu_proxy['http'].split('@')[-1]
                 print(f"🌐 [Tentativa {tentativa}/{max_tentativas}] Usando Proxy: {ip_display}")
 
+                # Usando chrome120 igual ao bot e sem headers manuais
                 session = requests.Session(
-                    impersonate="chrome124",
+                    impersonate="chrome120",
                     proxies=meu_proxy
                 )
-
-                login_headers = {
-                    "Accept": "application/json, text/plain, */*",
-                    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-                    "Origin": "https://privacy.com.br",
-                    "Referer": "https://privacy.com.br/",
-                    "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-                    "Sec-Ch-Ua-Mobile": "?0",
-                    "Sec-Ch-Ua-Platform": '"Windows"',
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "cors",
-                    "Sec-Fetch-Site": "same-site",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                    "Content-Type": "application/json"
-                }
 
                 payload = {
                     "Email": email,
@@ -133,7 +119,8 @@ def main():
                 time.sleep(random.uniform(5.0, 10.0))
 
                 try:
-                    login_resp = session.post(LOGIN_API_URL, json=payload, headers=login_headers, timeout=20)
+                    # Headers removidos daqui, o curl_cffi cria os originais automaticamente
+                    login_resp = session.post(LOGIN_API_URL, json=payload, timeout=20)
 
                     if login_resp.status_code in [403, 429]:
                         print(f"⚠️ Bloqueio {login_resp.status_code} detectado. Trocando de proxy...")
